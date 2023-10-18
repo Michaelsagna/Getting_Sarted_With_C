@@ -24,31 +24,25 @@
 struct book                                                     /*Struktur eines Katalogeintrags*/
 {
     long int isbn;
-    char author[50];
-    char titel[50];
+    char author[100];
+    char titel[100];
     short erscheinungsjahr;
-    char verlag[20];
+    char verlag[50];
 };
 typedef struct book BUCH;
 /*********************************************************************************************/
                                                                         /*Prototypen*/
 extern int menue(void);
-extern int add(void);
-extern void show(void);
-extern void sort(void);
-extern int input(char *buffer,int max,...);
-extern void flush();
-extern int search_byAuthor(BUCH *kat,int len,char*);
-extern int input(char *buffer,int max,...);
-extern void strtoup(char *);
-extern int string_compare(const void *b1,const void *b2);
-
-                                                                        /*Globale Daten*/
-extern BUCH katakog[];                                      
-extern int kat_len;
-
-extern char *auswahl[];
-
+extern int addBook(void);
+extern void showKatalogEntries(void);
+extern void sortKatalog(void);
+static int readUserInput(char *buffer,int max,...);
+extern void flushInputBuffer();
+static int search_byAuthor(BUCH *kat,int len,char*);
+static void strtoup(char *);
+static int string_compare(const void *b1,const void *b2);
+extern void updateKatalogData();
+extern int initKatalogData();
 /* Ende der Headerdatei*/
 
 

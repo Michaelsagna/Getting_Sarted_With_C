@@ -5,30 +5,33 @@
  *                          2. neues Element zum bestehenden Bestand hinzufügen.
  *                          3. Bestand alphabetisch nach Namen sortieren.
  *                          4. Das Programm beenden durch die ESC-Taste
- *Mögliche Erweiterungen: Bestand dauerhaft speichern, so dass der Inhalt aktulisiert wird bei jede Änderung.   */
+ *Mögliche Erweiterungen: Bestand dauerhaft speichern, so dass der Inhalt aktulisiert wird bei jede Änderung.   
+ *Diese Erweiterung wurde nun umgesetzt und erfolgreich getestet*/
 #include "book_katalog.h"
-
+BUCH katalog[KAT_SIZE]={};
+int kat_len=0;
 
 void main()
 {   
-    
+    kat_len=initKatalogData();
     int choice;
     while((choice=menue())!=ESC)
     {
-        flush();
+        flushInputBuffer();
         switch (choice)
         {
-            case SHOW:  show();
+            case SHOW:  showKatalogEntries();
                         break;
-            case ADD:   if(add()) kat_len++;
+            case ADD:   if(addBook()) kat_len++;
                         break;
-            case SORT:  sort();
+            case SORT:  sortKatalog();
                         break;
             default:    printf("\nUngültige Eingabe!\nMögliche Eingaben : - 1 - 2 - 3 - ESC - \n");    
                         break;
         }
         WEITER;
-        flush();
+        flushInputBuffer();
     }
+    updateKatalogData();
      
 }

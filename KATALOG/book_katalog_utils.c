@@ -1,15 +1,18 @@
 #include"book_katalog.h"
-
-char *auswahl[]={"            1 = Katalogeinträge anzeigen.\n\n",
+                                                                        /*Globale Daten*/
+extern BUCH katalog[];                                                  /*Deklaration der Programmglobalen Daten*/
+extern int kat_len;                                                     /*Erst dadurch wird die Sichtbarkkeit dieser Daten in anderen Modulen des Programms ermöglicht */
+static char *auswahl[]={"            1 = Katalogeinträge anzeigen.\n\n",
                     "            2 = Katalogeinträge hinzufügen.\n\n",
                     "            3 = Katalogeinträge sortieren.\n\n",
                     "            ESC = Programm beenden.\n\n",
                     "Ihre Wahl: \n>"};
-BUCH katakog[KAT_SIZE] = {{3608947590L, "MARTIN HEIDEGGER", "Der Satz vom Grund", 2022, "Klett-Cotta"}, {3866474075L, "ARTHUR SCHOPENHAUER", "Die Welt als Wille und Vorstellung", 1818, "Anaconda Verlag"}, {9783484701533L, "MARTIN HEIDEGGER", "Sein und Zeit", 1927, "Niemeyer Tübingen"}, {3608947590L, "MARTIN HEIDEGGER", "Der Satz vom Grund", 2022, "Klett-Cotta"}};
-int kat_len=4;
+
 /*********************************************************************************************/
+/*HauptFunktionalitäten*/
 int menue(void)
 {
+    
     CLS;
     HEADER;
     LOCATE(6,1);
@@ -20,17 +23,17 @@ int menue(void)
     return getchar();
 }
 /*********************************************************************************************/
-void show()
+void showKatalogEntries()
 {
     printf("Suchbegriff eingeben \n>");
     
     char name[30]; int count;
-    int eingabe=input(name,29,ESC,'\r');
+    int eingabe=readUserInput(name,29,ESC,'\r');
     if(eingabe==ESC)
         return;
         
     strtoup(name);
-    count=search_byAuthor(katakog,kat_len,name);
+    count=search_byAuthor(katalog,kat_len,name);
     if(count==0)
         printf("\n\nEs wurde kein passender Eintrag gefunden. \n");
     
@@ -40,13 +43,13 @@ void show()
 
 }
 
-int add()
+int addBook()
 {
     int is_added=0;
-    char entry_msg[]="ISBN\t\t\t\t--->\n\nAUTHOR\t\t\t\t--->\n\nTITEL\t\t\t\t--->\n\nERSCHEINUNGSJAHR\t\t--->\n\nVERLAG\t\t\t\t--->\n\n";
+    static char entry_msg[]="ISBN\t\t\t\t--->\n\nAUTHOR\t\t\t\t--->\n\nTITEL\t\t\t\t--->\n\nERSCHEINUNGSJAHR\t\t--->\n\nVERLAG\t\t\t\t--->\n\n";
     char buffer[50];
     BUCH *kat_ptr;
-    kat_ptr=katakog+kat_len;
+    kat_ptr=katalog+kat_len;
     CLS;
     HEADER;
     LOCATE(4,1);
@@ -57,49 +60,49 @@ int add()
     printf("%s",entry_msg);
 
     LOCATE(6,40);
-    if(input(buffer,49,ESC,'\r')==ESC)
+    if(readUserInput(buffer,49,ESC,'\r')==ESC)
         return is_added;
     kat_ptr->isbn=atol(buffer);
 
     LOCATE(8,40);
-    if(input(buffer,49,ESC,'\r')==ESC)
+    if(readUserInput(buffer,49,ESC,'\r')==ESC)
         return is_added;
     strtoup(buffer);
     strcpy(kat_ptr->author,buffer);
 
     LOCATE(10,40);
-    if(input(buffer,49,ESC,'\r')==ESC)
+    if(readUserInput(buffer,49,ESC,'\r')==ESC)
         return is_added;
     strcpy(kat_ptr->titel,buffer);
 
     LOCATE(12,40);
-    if(input(buffer,49,ESC,'\r')==ESC)
+    if(readUserInput(buffer,49,ESC,'\r')==ESC)
         return is_added;
     kat_ptr->erscheinungsjahr=atoi(buffer);
 
     LOCATE(14,40);
-    if(input(buffer,49,ESC,'\r')==ESC)
+    if(readUserInput(buffer,49,ESC,'\r')==ESC)
         return is_added;
     strcpy(kat_ptr->verlag,buffer);
     is_added=1;
     return is_added;
 }
 
-void sort()
+void sortKatalog()
 {
-    qsort(katakog,kat_len,sizeof(BUCH),string_compare);
+    qsort(katalog,kat_len,sizeof(BUCH),string_compare);
     printf(" \n\nSortiervorgang erfolgreich abgeschlossen!\n\n");
 }
 
 /*********************************************************************************************/
-int string_compare(const void *b1,const void *b2)
+/*HilfsFunktionalitäten*/
+static int string_compare(const void *b1,const void *b2)
 {
     const BUCH *_b1=b1,*_b2=b2;
     return strncmp(_b1->author,_b2->author,strlen(_b1->author));
 }
 
-/*Zum Einlesen der Usereingabe*/
-int input(char *buffer,int max,...)
+static int readUserInput(char *buffer,int max,...)
 {
     int c, breakc;
     int nc=0;
@@ -136,7 +139,7 @@ int input(char *buffer,int max,...)
 
 }
 
-int search_byAuthor(BUCH *kat,int len,char *pattern)
+static int search_byAuthor(BUCH *kat,int len,char *pattern)
 {
     int len_id, anzahl=0;
     len_id=strlen(pattern);
@@ -148,6 +151,7 @@ int search_byAuthor(BUCH *kat,int len,char *pattern)
             printf("BuchNummer: %-40lu\n",(kat)->isbn);
             printf("Author: %-40s\n",(kat)->author);
             printf("Titel: %-40s\n",(kat)->titel);
+            printf("Erschienen im Jahr: %-4i\n",(kat)->erscheinungsjahr);
             printf("Verlag: %-40s\n",(kat)->verlag);
             ++anzahl;
         }
@@ -159,7 +163,7 @@ int search_byAuthor(BUCH *kat,int len,char *pattern)
     
 }
 
-void strtoup(char *str)
+static void strtoup(char *str)
 {
     char *sp=str;
 
@@ -173,7 +177,7 @@ void strtoup(char *str)
     
 }
 
-void flush()
+void flushInputBuffer()
 {
     int c;
     while((c=getchar())!='\n' && c!=EOF)
@@ -181,3 +185,44 @@ void flush()
         ;
     }
 }
+
+/*********************************************************************************************/
+/*Ergänzende Funktionalitäten*/
+void updateKatalogData()
+{
+    FILE *fp;
+    if((fp=fopen("./katalogInitData","w"))!=NULL)
+    {
+        fwrite(katalog,sizeof(BUCH),kat_len,fp);
+        fclose(fp);
+    }
+   
+}
+
+int initKatalogData()
+{
+    FILE *fp;
+    int filesize=0,len=0,len_final=0;
+    if((fp=fopen("./katalogInitData","r"))!=NULL)
+    {
+        fseek(fp,0L,SEEK_END);
+        filesize=ftell(fp);
+        len=filesize/sizeof(BUCH);
+        rewind(fp);
+        len_final=fread(katalog,sizeof(BUCH),len,fp);
+        fclose(fp);
+    }
+
+    else
+    {
+
+        if(addBook())
+            len_final++;
+    }
+    return len_final;
+
+    
+    
+}
+
+
